@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oikos AI — AI Sales &amp; Marketing Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#161B22;
+    --ink-2:#1E2530;
+    --ink-3:#252D3A;
+    --paper:#EDEAE1;
+    --paper-dim:#B7B2A3;
+    --brass:#B9915C;
+    --brick:#B4552F;
+    --sage:#8A9A72;
+    --blue:#6C8EA6;
+    --line: rgba(237,234,225,0.14);
+    --line-strong: rgba(237,234,225,0.28);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--ink); color:var(--paper); font-family:'Inter',sans-serif;
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .serif{font-family:'Fraunces',serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  @media(max-width:640px){.wrap{padding:0 18px;}}
+
+  header{border-bottom:1px solid var(--line); position:sticky; top:0; z-index:30; background:rgba(22,27,34,0.94); backdrop-filter:blur(6px);}
+  .topbar{display:flex; align-items:center; justify-content:space-between; height:60px; gap:20px;}
+  .brand{display:flex; align-items:baseline; gap:9px; flex-shrink:0;}
+  .brand-mark{width:9px;height:9px;background:var(--brass); display:inline-block; transform:rotate(45deg);}
+  .brand-name{font-family:'Fraunces',serif; font-size:1.08rem; font-weight:500;}
+
+  .tabs{display:flex; gap:2px; overflow-x:auto; scrollbar-width:none;}
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{
+    font-family:'IBM Plex Mono',monospace; font-size:0.72rem; letter-spacing:0.02em;
+    color:var(--paper-dim); background:transparent; border:1px solid transparent;
+    padding:9px 14px; cursor:pointer; white-space:nowrap; transition:color .15s,border-color .15s,background .15s;
+  }
+  .tab-btn:hover{color:var(--paper);}
+  .tab-btn.active{color:var(--ink); background:var(--brass); border-color:var(--brass);}
+
+  main{padding:44px 0 80px;}
+  .view{display:none;}
+  .view.active{display:block; animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .page-head{margin-bottom:32px;}
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:0.75rem; color:var(--brass); margin-bottom:10px;}
+  h1{font-family:'Fraunces',serif; font-weight:500; font-size:1.9rem; letter-spacing:-0.01em;}
+  .page-sub{color:var(--paper-dim); font-size:0.94rem; max-width:60ch; margin-top:10px;}
+
+  /* KPI cards */
+  .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); margin-top:28px;}
+  @media(max-width:760px){.kpi-row{grid-template-columns:repeat(2,1fr);}}
+  .kpi{background:var(--ink); padding:22px 20px;}
+  .kpi .label{font-size:0.76rem; color:var(--paper-dim); font-family:'IBM Plex Mono',monospace;}
+  .kpi .num{font-family:'IBM Plex Mono',monospace; font-size:1.7rem; margin-top:10px;}
+  .kpi .delta{font-size:0.78rem; margin-top:6px;}
+  .delta.up{color:var(--sage);} .delta.down{color:var(--brick);}
+
+  /* ledger reused */
+  .ledger{width:100%; border-collapse:collapse; font-size:0.88rem; margin-top:28px;}
+  .ledger thead th{text-align:left; font-weight:500; color:var(--paper-dim); border-bottom:1px solid var(--line-strong); padding:8px 12px 10px 0; font-size:0.74rem; font-family:'IBM Plex Mono',monospace;}
+  .ledger tbody td{padding:13px 12px 13px 0; border-bottom:1px solid var(--line);}
+  .ledger tbody tr:hover{background:rgba(237,234,225,0.03);}
+  .bar-cell{width:130px;}
+  .bar-track{height:6px; background:rgba(237,234,225,0.1); position:relative;}
+  .bar-fill{height:100%;}
+  .score-tag{font-size:0.82rem;}
+
+  section.block{margin-bottom:48px;}
+  .block-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:10px;}
+  .block-head h2{font-family:'Fraunces',serif; font-weight:500; font-size:1.25rem;}
+  .idx{font-family:'IBM Plex Mono',monospace; font-size:0.74rem; color:var(--brass);}
+
+  /* dashboard mini chart */
+  .chart-wrap{border:1px solid var(--line); padding:20px; background:var(--ink-2);}
+  .chart-wrap svg{width:100%; height:auto; display:block;}
+
+  /* WhatsApp view */
+  .wa-shell{display:grid; grid-template-columns:340px 1fr; gap:40px;}
+  @media(max-width:820px){.wa-shell{grid-template-columns:1fr;}}
+  .phone{
+    border:1px solid var(--line-strong); background:var(--ink-2); border-radius:18px; overflow:hidden;
+    display:flex; flex-direction:column; height:520px;
+  }
+  .phone-head{background:var(--ink-3); padding:14px 18px; display:flex; align-items:center; gap:10px; border-bottom:1px solid var(--line);}
+  .phone-avatar{width:30px;height:30px;border-radius:50%; background:var(--sage); display:flex; align-items:center; justify-content:center; font-size:0.8rem; color:var(--ink); font-weight:600;}
+  .phone-name{font-size:0.86rem;} .phone-status{font-size:0.7rem; color:var(--sage); font-family:'IBM Plex Mono',monospace;}
+  .phone-body{flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:10px;}
+  .bubble{max-width:80%; padding:9px 13px; border-radius:12px; font-size:0.85rem; line-height:1.4; opacity:0; transform:translateY(6px); animation:pop .35s forwards;}
+  @keyframes pop{to{opacity:1; transform:translateY(0);}}
+  .bubble.buyer{align-self:flex-end; background:var(--brass); color:var(--ink); border-bottom-right-radius:3px;}
+  .bubble.ai{align-self:flex-start; background:var(--ink-3); border:1px solid var(--line-strong); border-bottom-left-radius:3px;}
+  .bubble .time{display:block; font-size:0.62rem; opacity:0.6; margin-top:4px;}
+  .typing{align-self:flex-start; font-size:0.78rem; color:var(--paper-dim); font-family:'IBM Plex Mono',monospace; padding:2px 4px;}
+  .phone-input{display:flex; gap:8px; padding:12px; border-top:1px solid var(--line);}
+  .phone-input input{flex:1; background:var(--ink); border:1px solid var(--line-strong); color:var(--paper-dim); padding:8px 10px; border-radius:20px; font-size:0.8rem;}
+  .replay-btn{background:none; border:1px solid var(--line-strong); color:var(--paper); font-family:'IBM Plex Mono',monospace; font-size:0.72rem; padding:7px 12px; cursor:pointer;}
+  .replay-btn:hover{border-color:var(--paper);}
+
+  .wa-notes{padding-top:6px;}
+  .wa-notes .note{display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--line);}
+  .wa-notes .note:first-child{padding-top:0;}
+  .wa-notes .note .tag{font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--brass); min-width:64px; padding-top:2px;}
+  .wa-notes .note h3{font-family:'Fraunces',serif; font-weight:500; font-size:0.98rem; margin-bottom:4px;}
+  .wa-notes .note p{color:var(--paper-dim); font-size:0.86rem;}
+
+  /* insights */
+  .insight-list{display:flex; flex-direction:column;}
+  .insight{display:flex; gap:18px; padding:20px 0; border-bottom:1px solid var(--line);}
+  .insight:last-child{border-bottom:none;}
+  .insight .kind{font-family:'IBM Plex Mono',monospace; font-size:0.7rem; min-width:78px; padding-top:3px;}
+  .insight .kind.up{color:var(--sage);} .insight .kind.down{color:var(--brick);} .insight .kind.action{color:var(--brass);}
+  .insight .body h3{font-family:'Fraunces',serif; font-weight:500; font-size:1.02rem; margin-bottom:6px;}
+  .insight .body p{color:var(--paper-dim); font-size:0.88rem; max-width:62ch;}
+  .insight .action-line{margin-top:10px; font-size:0.78rem; color:var(--brass); font-family:'IBM Plex Mono',monospace;}
+
+  /* funnel */
+  .funnel{display:flex; flex-direction:column; gap:14px; margin-top:28px;}
+  .funnel-row{display:grid; grid-template-columns:130px 1fr 150px; align-items:center; gap:16px;}
+  @media(max-width:640px){.funnel-row{grid-template-columns:90px 1fr 110px; gap:10px;}}
+  .funnel-label{font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--paper-dim);}
+  .funnel-bar-track{height:34px; background:rgba(237,234,225,0.06); position:relative; display:flex; align-items:center;}
+  .funnel-bar{height:100%; display:flex; align-items:center; padding-left:12px; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; color:var(--ink); white-space:nowrap;}
+  .funnel-meta{font-family:'IBM Plex Mono',monospace; font-size:0.75rem; color:var(--paper-dim); text-align:right;}
+  .funnel-conv{text-align:center; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--paper-dim); margin:-4px 0;}
+
+  .stat-strip{display:flex; gap:36px; margin-top:32px; flex-wrap:wrap;}
+  .stat-strip .stat .num{font-family:'IBM Plex Mono',monospace; font-size:1.4rem;}
+  .stat-strip .stat .label{font-size:0.76rem; color:var(--paper-dim); margin-top:4px;}
+
+  footer{padding:36px 0; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; color:var(--paper-dim); font-size:0.8rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><span class="brand-mark"></span><span class="brand-name">Oikos&nbsp;AI</span></div>
+    <div class="tabs">
+      <button class="tab-btn active" data-view="dashboard">Dashboard</button>
+      <button class="tab-btn" data-view="scoring">Lead Scoring</button>
+      <button class="tab-btn" data-view="whatsapp">WhatsApp Agent</button>
+      <button class="tab-btn" data-view="insights">AI Insights</button>
+      <button class="tab-btn" data-view="funnel">Marketing → Revenue</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 1. DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="page-head">
+      <div class="eyebrow">OVERVIEW</div>
+      <h1>This month at a glance</h1>
+      <p class="page-sub">Sales and marketing performance in one view — updated live as leads move through the pipeline.</p>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi"><div class="label">LEADS</div><div class="num">428</div><div class="delta up">▲ 12% vs last month</div></div>
+      <div class="kpi"><div class="label">SITE VISITS</div><div class="num">156</div><div class="delta up">▲ 6% vs last month</div></div>
+      <div class="kpi"><div class="label">BOOKINGS</div><div class="num">34</div><div class="delta down">▼ 3% vs last month</div></div>
+      <div class="kpi"><div class="label">REVENUE</div><div class="num">AED 61.2M</div><div class="delta up">▲ 9% vs last month</div></div>
+    </div>
+
+    <section class="block" style="margin-top:44px;">
+      <div class="block-head"><h2>Bookings &amp; revenue trend</h2><div class="idx">Last 6 months</div></div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg">
+          <line x1="35" y1="10" x2="35" y2="155" stroke="#EDEAE1" stroke-opacity="0.25"/>
+          <line x1="35" y1="155" x2="440" y2="155" stroke="#EDEAE1" stroke-opacity="0.25"/>
+          <polyline fill="none" stroke="#B9915C" stroke-width="2" points="35,120 105,110 175,100 245,95 315,80 385,60"/>
+          <polyline fill="none" stroke="#8A9A72" stroke-width="2" points="35,140 105,132 175,128 245,118 315,105 385,90"/>
+          <text x="35" y="172" fill="#B7B2A3" font-family="IBM Plex Mono" font-size="9">Apr</text>
+          <text x="385" y="172" text-anchor="end" fill="#B7B2A3" font-family="IBM Plex Mono" font-size="9">Sep</text>
+        </svg>
+        <div style="margin-top:10px; font-size:0.78rem; color:var(--paper-dim);">
+          <span style="color:var(--brass)">— revenue</span> &nbsp; <span style="color:var(--sage)">— bookings</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Pipeline snapshot</h2><div class="idx">By stage</div></div>
+      <table class="ledger">
+        <thead><tr><th>Stage</th><th>Count</th><th>Share of pipeline</th></tr></thead>
+        <tbody>
+          <tr><td>New lead</td><td class="mono">184</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:100%; background:var(--blue);"></div></div></td></tr>
+          <tr><td>Qualified</td><td class="mono">142</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:77%; background:var(--brass);"></div></div></td></tr>
+          <tr><td>Site visit booked</td><td class="mono">156</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:85%; background:var(--sage);"></div></div></td></tr>
+          <tr><td>Offer stage</td><td class="mono">58</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:32%; background:var(--brick);"></div></div></td></tr>
+          <tr><td>Booked</td><td class="mono">34</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:18%; background:var(--paper);"></div></div></td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- 2. LEAD SCORING -->
+  <div class="view" id="view-scoring">
+    <div class="page-head">
+      <div class="eyebrow">AI LEAD SCORING</div>
+      <h1>Every lead ranked the moment it arrives</h1>
+      <p class="page-sub">Score is based on budget signal, response speed, engagement, and stated timeline — recalculated after every interaction.</p>
+    </div>
+    <table class="ledger">
+      <thead>
+        <tr><th>Lead</th><th>Source</th><th>Interested in</th><th>Status</th><th>Score</th><th>Last touch</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>R. Kapoor</td><td class="mono">Instagram DM</td><td>2BR · Tower B</td><td class="score-tag">🔥 Hot</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:88%; background:var(--brick);"></div></div></td><td class="mono">12 min ago</td></tr>
+        <tr><td>S. Al-Farsi</td><td class="mono">Web form</td><td>Penthouse · Tower A</td><td class="score-tag">🔥 Hot</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:81%; background:var(--brick);"></div></div></td><td class="mono">40 min ago</td></tr>
+        <tr><td>M. Chen</td><td class="mono">WhatsApp</td><td>1BR · Tower C</td><td class="score-tag">🟡 Warm</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:56%; background:var(--brass);"></div></div></td><td class="mono">2 hr ago</td></tr>
+        <tr><td>A. Verma</td><td class="mono">Referral</td><td>3BR · Tower B</td><td class="score-tag">🟡 Warm</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:49%; background:var(--brass);"></div></div></td><td class="mono">5 hr ago</td></tr>
+        <tr><td>J. Osei</td><td class="mono">Web form</td><td>Studio · Tower C</td><td class="score-tag">🔵 Cold</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:22%; background:var(--blue);"></div></div></td><td class="mono">1 day ago</td></tr>
+        <tr><td>P. Nair</td><td class="mono">Ad click</td><td>1BR · Tower A</td><td class="score-tag">🔵 Cold</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" style="width:16%; background:var(--blue);"></div></div></td><td class="mono">2 days ago</td></tr>
+      </tbody>
+    </table>
+
+    <section class="block" style="margin-top:44px;">
+      <div class="block-head"><h2>How the score is built</h2></div>
+      <table class="ledger">
+        <thead><tr><th>Signal</th><th>Weight</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Response speed</td><td class="mono">30%</td><td>Replies within minutes vs. hours</td></tr>
+          <tr><td>Budget match</td><td class="mono">25%</td><td>Stated budget fits unit price band</td></tr>
+          <tr><td>Engagement depth</td><td class="mono">25%</td><td>Asked about floor plan, payment plan, visit</td></tr>
+          <tr><td>Timeline urgency</td><td class="mono">20%</td><td>"Looking to move in next month"</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- 3. WHATSAPP AGENT -->
+  <div class="view" id="view-whatsapp">
+    <div class="page-head">
+      <div class="eyebrow">AI WHATSAPP AGENT</div>
+      <h1>What the buyer actually sees</h1>
+      <p class="page-sub">The same agent that scores the lead also responds to it — in real time, in the buyer's own chat thread.</p>
+    </div>
+    <div class="wa-shell">
+      <div class="phone">
+        <div class="phone-head">
+          <div class="phone-avatar">RK</div>
+          <div>
+            <div class="phone-name">R. Kapoor</div>
+            <div class="phone-status">● Oikos AI Agent · online</div>
+          </div>
+        </div>
+        <div class="phone-body" id="phoneBody"></div>
+        <div class="phone-input">
+          <input type="text" placeholder="Message..." disabled>
+          <button class="replay-btn" id="replayBtn">Replay</button>
+        </div>
+      </div>
+      <div class="wa-notes">
+        <div class="note">
+          <div class="tag">00:00</div>
+          <div><h3>Instant first response</h3><p>The agent replies inside seconds of the enquiry landing — before a human rep would typically even see the notification.</p></div>
+        </div>
+        <div class="note">
+          <div class="tag">QUALIFY</div>
+          <div><h3>Qualifying questions feel natural</h3><p>Budget, timeline, and unit preference are gathered conversationally, not as a form.</p></div>
+        </div>
+        <div class="note">
+          <div class="tag">HANDOFF</div>
+          <div><h3>Escalates at the right moment</h3><p>Once intent is confirmed, the agent books a visit slot directly and flags the lead to a human closer — this is the "hot" lead you saw on the scoring tab.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AI INSIGHTS -->
+  <div class="view" id="view-insights">
+    <div class="page-head">
+      <div class="eyebrow">AI INSIGHTS</div>
+      <h1>Why the numbers moved — and what to do</h1>
+      <p class="page-sub">Generated nightly from lead, visit, and pricing data. Not a dashboard you have to interpret yourself.</p>
+    </div>
+    <div class="insight-list">
+      <div class="insight">
+        <div class="kind up">▲ UP</div>
+        <div class="body">
+          <h3>Revenue is up 9% this month, driven almost entirely by Tower A.</h3>
+          <p>Penthouse enquiries from the new Instagram campaign are converting to bookings at 2.3x the rate of other channels this quarter.</p>
+          <div class="action-line">→ recommended: shift 15% more ad budget from Google Search to Instagram</div>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="kind down">▼ DOWN</div>
+        <div class="body">
+          <h3>Bookings dipped 3% despite leads being up 12%.</h3>
+          <p>The gap is concentrated in Tower C — leads are qualifying fine, but visit-to-booking conversion fell from 24% to 15% after the last price adjustment.</p>
+          <div class="action-line">→ recommended: revisit the Tower C studio price, or add a limited-time incentive</div>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="kind action">ACTION</div>
+        <div class="body">
+          <h3>3 hot leads have gone quiet for 24+ hours.</h3>
+          <p>R. Kapoor and two others scored above 80 have had no outbound contact in over a day — the single highest-leverage gap in the pipeline today.</p>
+          <div class="action-line">→ recommended: escalate to a human rep via WhatsApp now</div>
+        </div>
+      </div>
+      <div class="insight">
+        <div class="kind up">▲ UP</div>
+        <div class="body">
+          <h3>Referral leads close 40% faster than paid channels.</h3>
+          <p>Average time from first contact to booking is 11 days for referrals vs. 19 days for paid ads, across the last quarter.</p>
+          <div class="action-line">→ recommended: launch a referral incentive for existing buyers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. MARKETING -> REVENUE -->
+  <div class="view" id="view-funnel">
+    <div class="page-head">
+      <div class="eyebrow">MARKETING → REVENUE</div>
+      <h1>Where every ad dirham actually goes</h1>
+      <p class="page-sub">From spend to signed booking — one continuous line, so marketing and sales stop arguing about attribution.</p>
+    </div>
+
+    <div class="funnel">
+      <div class="funnel-row">
+        <div class="funnel-label">Ad spend</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:100%; background:var(--blue);">AED 180,000</div></div>
+        <div class="funnel-meta">baseline</div>
+      </div>
+      <div class="funnel-conv">↓ AED 421 cost per lead</div>
+      <div class="funnel-row">
+        <div class="funnel-label">Leads</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:78%; background:var(--brass);">428 leads</div></div>
+        <div class="funnel-meta">100%</div>
+      </div>
+      <div class="funnel-conv">↓ 36% booked a visit</div>
+      <div class="funnel-row">
+        <div class="funnel-label">Site visits</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:52%; background:var(--sage);">156 visits</div></div>
+        <div class="funnel-meta">36%</div>
+      </div>
+      <div class="funnel-conv">↓ 22% converted to booking</div>
+      <div class="funnel-row">
+        <div class="funnel-label">Bookings</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:26%; background:var(--brick);">34 bookings</div></div>
+        <div class="funnel-meta">8%</div>
+      </div>
+      <div class="funnel-conv">↓ AED 1.8M avg. booking value</div>
+      <div class="funnel-row">
+        <div class="funnel-label">Revenue</div>
+        <div class="funnel-bar-track"><div class="funnel-bar" style="width:100%; background:var(--paper);">AED 61.2M</div></div>
+        <div class="funnel-meta">340x ROAS</div>
+      </div>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="num" style="color:var(--brass)">AED 421</div><div class="label">cost per lead</div></div>
+      <div class="stat"><div class="num" style="color:var(--sage)">AED 5,294</div><div class="label">cost per booking</div></div>
+      <div class="stat"><div class="num" style="color:var(--paper)">340x</div><div class="label">return on ad spend</div></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="wrap">
+  <div>Oikos AI — demo build. Sample data shown for illustration.</div>
+  <div class="mono">github.com/your-repo/oikos-ai-demo</div>
+</footer>
+
+<script>
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab-btn');
+  const views = document.querySelectorAll('.view');
+  tabs.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabs.forEach(b => b.classList.remove('active'));
+      views.forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('view-' + btn.dataset.view).classList.add('active');
+      if (btn.dataset.view === 'whatsapp') playChat();
+    });
+  });
+
+  // WhatsApp chat simulation
+  const script = [
+    { who: 'buyer', text: "Hi, I saw the 2BR listing in Tower B. Is it still available?" },
+    { who: 'ai', text: "Yes, it's available! It's a 2-bedroom on floor 15, sea-facing, AED 1.91M. Are you looking to move in soon, or planning ahead?" },
+    { who: 'buyer', text: "Planning ahead, maybe in the next 2 months." },
+    { who: 'ai', text: "Got it. Would you like to book a site visit this week? I have Thursday 4 PM or Saturday 11 AM open." },
+    { who: 'buyer', text: "Saturday 11 AM works." },
+    { who: 'ai', text: "Booked ✅ — Saturday 11 AM, Tower B. I've also notified our sales lead Aisha, she'll call you shortly to confirm payment plan options." }
+  ];
+
+  let chatRunning = false;
+  async function playChat(){
+    if (chatRunning) return;
+    chatRunning = true;
+    const body = document.getElementById('phoneBody');
+    body.innerHTML = '';
+    for (const msg of script) {
+      const typing = document.createElement('div');
+      typing.className = 'typing';
+      typing.textContent = msg.who === 'ai' ? 'Agent is typing…' : 'typing…';
+      body.appendChild(typing);
+      body.scrollTop = body.scrollHeight;
+      await new Promise(r => setTimeout(r, 650));
+      typing.remove();
+
+      const b = document.createElement('div');
+      b.className = 'bubble ' + msg.who;
+      b.innerHTML = msg.text + '<span class="time">' + (msg.who === 'buyer' ? 'Buyer' : 'AI Agent') + '</span>';
+      body.appendChild(b);
+      body.scrollTop = body.scrollHeight;
+      await new Promise(r => setTimeout(r, 500));
+    }
+    chatRunning = false;
+  }
+  document.getElementById('replayBtn').addEventListener('click', () => { chatRunning = false; playChat(); });
+
+  // Build inventory-less: nothing else needed. Auto-play chat on first load if that tab becomes active later.
+</script>
+
+</body>
+</html>

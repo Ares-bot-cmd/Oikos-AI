@@ -1,0 +1,4 @@
+venv/
+oikos_ai.db
+__pycache__/
+*.pyc
