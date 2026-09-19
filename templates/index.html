@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Oikos AI — AI Sales &amp; Marketing Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏛️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap topbar">
+    <div class="brand"><span class="brand-mark"></span><span class="brand-name">Oikos&nbsp;AI</span></div>
+    <div class="tabs">
+      <button class="tab-btn active" data-view="dashboard">Dashboard</button>
+      <button class="tab-btn" data-view="scoring">Lead Scoring</button>
+      <button class="tab-btn" data-view="whatsapp">WhatsApp Agent</button>
+      <button class="tab-btn" data-view="insights">AI Insights</button>
+      <button class="tab-btn" data-view="funnel">Marketing → Revenue</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 1. DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="page-head">
+      <div class="eyebrow">OVERVIEW</div>
+      <h1>This month at a glance</h1>
+      <p class="page-sub">Sales and marketing performance in one view — updated live as leads move through the pipeline.</p>
+    </div>
+
+    <div class="kpi-row" id="kpiRow">
+      <div class="kpi"><div class="label">LEADS</div><div class="num">—</div><div class="delta">Loading…</div></div>
+      <div class="kpi"><div class="label">SITE VISITS</div><div class="num">—</div><div class="delta">Loading…</div></div>
+      <div class="kpi"><div class="label">BOOKINGS</div><div class="num">—</div><div class="delta">Loading…</div></div>
+      <div class="kpi"><div class="label">REVENUE</div><div class="num">—</div><div class="delta">Loading…</div></div>
+    </div>
+
+    <section class="block" style="margin-top:44px;">
+      <div class="block-head"><h2>Bookings &amp; revenue trend</h2><div class="idx">Last 6 months</div></div>
+      <div class="chart-wrap">
+        <svg viewBox="0 0 460 190" xmlns="http://www.w3.org/2000/svg" id="trendSvg">
+          <line x1="35" y1="10" x2="35" y2="155" stroke="#EDEAE1" stroke-opacity="0.25"/>
+          <line x1="35" y1="155" x2="440" y2="155" stroke="#EDEAE1" stroke-opacity="0.25"/>
+          <polyline id="revenueLine" fill="none" stroke="#B9915C" stroke-width="2" points=""/>
+          <polyline id="bookingsLine" fill="none" stroke="#8A9A72" stroke-width="2" points=""/>
+          <text id="trendFirstMonth" x="35" y="172" fill="#B7B2A3" font-family="IBM Plex Mono" font-size="9"></text>
+          <text id="trendLastMonth" x="385" y="172" text-anchor="end" fill="#B7B2A3" font-family="IBM Plex Mono" font-size="9"></text>
+        </svg>
+        <div style="margin-top:10px; font-size:0.78rem; color:var(--paper-dim);">
+          <span style="color:var(--brass)">— revenue</span> &nbsp; <span style="color:var(--sage)">— bookings</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="block-head"><h2>Pipeline snapshot</h2><div class="idx">By stage</div></div>
+      <table class="ledger">
+        <thead><tr><th>Stage</th><th>Count</th><th>Share of pipeline</th></tr></thead>
+        <tbody id="pipelineBody">
+          <tr><td colspan="3" class="mono" style="color:var(--paper-dim);">Loading…</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- 2. LEAD SCORING -->
+  <div class="view" id="view-scoring">
+    <div class="page-head">
+      <div class="eyebrow">AI LEAD SCORING</div>
+      <h1>Every lead ranked the moment it arrives</h1>
+      <p class="page-sub">Score is based on budget signal, response speed, engagement, and stated timeline — recalculated after every interaction.</p>
+    </div>
+    <table class="ledger">
+      <thead>
+        <tr><th>Lead</th><th>Source</th><th>Interested in</th><th>Status</th><th>Score</th><th>Last touch</th></tr>
+      </thead>
+      <tbody id="leadsBody">
+        <tr><td colspan="6" class="mono" style="color:var(--paper-dim);">Loading…</td></tr>
+      </tbody>
+    </table>
+
+    <section class="block" style="margin-top:44px;">
+      <div class="block-head"><h2>How the score is built</h2></div>
+      <table class="ledger">
+        <thead><tr><th>Signal</th><th>Weight</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>Response speed</td><td class="mono">30%</td><td>Replies within minutes vs. hours</td></tr>
+          <tr><td>Budget match</td><td class="mono">25%</td><td>Stated budget fits unit price band</td></tr>
+          <tr><td>Engagement depth</td><td class="mono">25%</td><td>Asked about floor plan, payment plan, visit</td></tr>
+          <tr><td>Timeline urgency</td><td class="mono">20%</td><td>"Looking to move in next month"</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+
+  <!-- 3. WHATSAPP AGENT -->
+  <div class="view" id="view-whatsapp">
+    <div class="page-head">
+      <div class="eyebrow">AI WHATSAPP AGENT</div>
+      <h1>What the buyer actually sees</h1>
+      <p class="page-sub">The same agent that scores the lead also responds to it — in real time, in the buyer's own chat thread.</p>
+    </div>
+    <div class="wa-shell">
+      <div class="phone">
+        <div class="phone-head">
+          <div class="phone-avatar" id="phoneAvatar">··</div>
+          <div>
+            <div class="phone-name" id="phoneName">Loading…</div>
+            <div class="phone-status">● Oikos AI Agent · online</div>
+          </div>
+        </div>
+        <div class="phone-body" id="phoneBody"></div>
+        <div class="phone-input">
+          <input type="text" placeholder="Message..." disabled>
+          <button class="replay-btn" id="replayBtn">Replay</button>
+        </div>
+      </div>
+      <div class="wa-notes">
+        <div class="note">
+          <div class="tag">00:00</div>
+          <div><h3>Instant first response</h3><p>The agent replies inside seconds of the enquiry landing — before a human rep would typically even see the notification.</p></div>
+        </div>
+        <div class="note">
+          <div class="tag">QUALIFY</div>
+          <div><h3>Qualifying questions feel natural</h3><p>Budget, timeline, and unit preference are gathered conversationally, not as a form.</p></div>
+        </div>
+        <div class="note">
+          <div class="tag">HANDOFF</div>
+          <div><h3>Escalates at the right moment</h3><p>Once intent is confirmed, the agent books a visit slot directly and flags the lead to a human closer — this is the "hot" lead you saw on the scoring tab.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. AI INSIGHTS -->
+  <div class="view" id="view-insights">
+    <div class="page-head">
+      <div class="eyebrow">AI INSIGHTS</div>
+      <h1>Why the numbers moved — and what to do</h1>
+      <p class="page-sub">Generated nightly from lead, visit, and pricing data. Not a dashboard you have to interpret yourself.</p>
+    </div>
+    <div class="insight-list" id="insightList">
+      <div class="insight"><div class="kind">···</div><div class="body"><h3>Loading…</h3></div></div>
+    </div>
+  </div>
+
+  <!-- 5. MARKETING -> REVENUE -->
+  <div class="view" id="view-funnel">
+    <div class="page-head">
+      <div class="eyebrow">MARKETING → REVENUE</div>
+      <h1>Where every ad rupee actually goes</h1>
+      <p class="page-sub">From spend to signed booking — one continuous line, so marketing and sales stop arguing about attribution.</p>
+    </div>
+
+    <div class="funnel" id="funnelBody">
+      <div class="funnel-row"><div class="funnel-label">Loading…</div></div>
+    </div>
+
+    <div class="stat-strip" id="funnelStats">
+      <div class="stat"><div class="num" style="color:var(--brass)">—</div><div class="label">cost per lead</div></div>
+      <div class="stat"><div class="num" style="color:var(--sage)">—</div><div class="label">cost per booking</div></div>
+      <div class="stat"><div class="num" style="color:var(--paper)">—</div><div class="label">return on ad spend</div></div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="wrap">
+  <div>Oikos AI — demo build. Sample data shown for illustration.</div>
+  <div class="mono">github.com/your-repo/oikos-ai-demo</div>
+</footer>
+
+<button id="chatToggle" aria-label="Open chat">💬</button>
+<div id="chatPanel">
+  <div id="chatHeader">
+    <span>Oikos AI Assistant</span>
+    <button id="chatClose" aria-label="Close chat">✕</button>
+  </div>
+  <div id="chatMessages"></div>
+  <form id="chatForm">
+    <input id="chatInput" type="text" placeholder="Ask about leads, funnel, strategy…" autocomplete="off">
+    <button type="submit" id="chatSend">Send</button>
+  </form>
+</div>
+
+<script src="/static/script.js"></script>
+
+</body>
+</html>

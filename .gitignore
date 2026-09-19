@@ -1,0 +1,26 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Database (local dev data — never commit real data)
+*.db
+*.sqlite3
+oikos_ai.db
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+build/
+dist/
+
+# Editor / OS cruft
+.vscode/
+.idea/
+.DS_Store
