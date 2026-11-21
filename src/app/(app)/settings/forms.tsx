@@ -6,7 +6,7 @@ import type { ActionState } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { ActionForm, FormField, SubmitButton } from "@/components/ui/form";
-import { Checkbox, Select } from "@/components/ui/field";
+import { Checkbox, Field, Select } from "@/components/ui/field";
 import { Notice } from "@/components/ui/states";
 import { toast } from "@/components/ui/toast";
 import {
@@ -48,12 +48,11 @@ export function AddCustomFieldButton() {
     <Dialog title="Add custom lead field" trigger={(open) => <Button size="sm" variant="secondary" onClick={open}><Plus className="size-3.5" /> Field</Button>}>
       <ActionForm action={addCustomFieldAction} className="space-y-3">
         <FormField label="Label" name="label" required placeholder="e.g. Loan pre-approved" />
-        <div>
-          <label htmlFor="fieldType" className="mb-1 block text-[13px] font-medium text-ink-2">Type</label>
-          <Select id="fieldType" name="fieldType" value={type} onChange={(e) => setType(e.target.value)}>
+        <Field label="Type" name="fieldType">
+          <Select name="fieldType" value={type} onChange={(e) => setType(e.target.value)}>
             <option value="text">Text</option><option value="number">Number</option><option value="date">Date</option><option value="select">Dropdown</option>
           </Select>
-        </div>
+        </Field>
         {type === "select" && <FormField label="Options (comma separated)" name="options" required placeholder="Yes, No, In progress" />}
         <div className="flex justify-end"><SubmitButton>Add field</SubmitButton></div>
       </ActionForm>

@@ -83,7 +83,10 @@ describe("CRM workflow", () => {
     expect((await T(exec1, (tx) => getLead(tx, exec1, id))).stage).toBe("contacted");
     await T(exec1, (tx) => changeStage(tx, exec1, id, "qualified"));
     await T(exec1, (tx) => scheduleFollowUp(tx, exec1, { leadId: id, dueAt: new Date(Date.now() + 3600_000).toISOString(), type: "call" }));
-    const { rows } = await T(exec1, (tx) => listFollowUps(tx, exec1, "today"));
+    // Due in an hour: "today" or, late in the evening, "upcoming".
+    const today = await T(exec1, (tx) => listFollowUps(tx, exec1, "today"));
+    const upcoming = await T(exec1, (tx) => listFollowUps(tx, exec1, "upcoming"));
+    const rows = [...today.rows, ...upcoming.rows];
     expect(rows.length).toBe(1);
     await T(exec1, (tx) => completeFollowUp(tx, exec1, rows[0].id, { outcome: "interested", note: "Wants to visit Saturday" }));
     const lead = await T(exec1, (tx) => getLead(tx, exec1, id));

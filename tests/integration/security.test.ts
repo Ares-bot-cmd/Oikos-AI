@@ -24,12 +24,12 @@ describe("authentication", () => {
   });
 
   it("rejects weak passwords and duplicate accounts", async () => {
-    await expect(signup({ name: "Weak", email: "weak@x.test", password: "short", organization: "W" })).rejects.toThrow();
-    await expect(signup({ name: "Dup", email: "SEC@owner.test", password: "another-pass-1", organization: "D" })).rejects.toThrow(/already exists/);
+    await expect(signup({ name: "Weak", email: "weak@x.test", password: "short", organization: "Weak Org" })).rejects.toThrow();
+    await expect(signup({ name: "Dup", email: "SEC@owner.test", password: "another-pass-1", organization: "Dup Org" })).rejects.toThrow(/already exists/);
   });
 
   it("locks the account after 5 failed attempts", async () => {
-    await signup({ name: "Lock", email: "lock@x.test", password: "lock-pass-123", organization: "L" });
+    await signup({ name: "Lock", email: "lock@x.test", password: "lock-pass-123", organization: "Lock Org" });
     for (let i = 0; i < 5; i++) await expect(authenticate({ email: "lock@x.test", password: "bad-password" }, `ip-${i}`)).rejects.toThrow(/Invalid/);
     await expect(authenticate({ email: "lock@x.test", password: "lock-pass-123" }, "ip-x")).rejects.toThrow(/locked/);
   });

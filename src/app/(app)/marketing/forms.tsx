@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { todayISO, useClientValue } from "@/lib/use-client-value";
 import { IndianRupee, Pencil, Plus, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +27,7 @@ function CampaignFields({ projects, v }: { projects: Opt[]; v?: Record<string, s
       <FormField label="UTM campaign" name="utmCampaign" defaultValue={val("utmCampaign")} />
       <FormField label="Start date" name="startDate" type="date" defaultValue={val("startDate")} />
       <FormField label="End date" name="endDate" type="date" defaultValue={val("endDate")} />
-      <FormField label="Budget (₹)" name="budget" type="number" defaultValue={val("budget")} inputProps={{ min: 0, step: 1000 }} />
+      <FormField label="Budget (₹)" name="budget" type="number" defaultValue={val("budget")} inputProps={{ min: 0, step: "any" }} />
     </div>
   );
 }
@@ -74,11 +75,12 @@ export function RecordSpendButton({ campaigns }: { campaigns: Opt[] }) {
 }
 
 export function ImportSpendButton() {
+  const fileId = useId();
   return (
     <Dialog title="Import spend (CSV)" description="Columns: campaign (name or ad-platform ID), date (YYYY-MM-DD or DD/MM/YYYY), amount, optional impressions and clicks. Export this from Meta Ads Manager or Google Ads." trigger={(open) => <Button variant="secondary" onClick={open}><Upload className="size-4" /> Import</Button>}>
       <ActionForm action={importSpendAction} className="space-y-3">
-        <Field label="CSV file" name="file" required>
-          <input id="file" name="file" type="file" accept=".csv,text/csv" required className="block w-full text-sm" />
+        <Field label="CSV file" name="file" id={fileId} required>
+          <input id={fileId} name="file" type="file" accept=".csv,text/csv" required className="block w-full text-sm" />
         </Field>
         <div className="flex justify-end"><SubmitButton pendingText="Importing…">Import</SubmitButton></div>
       </ActionForm>

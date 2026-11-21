@@ -67,8 +67,8 @@ export function LeadForm({ options, defaults, leadId }: { options: LeadFormOptio
         <F label="Full name" name="name" required defaultValue={v("name")} error={errors.name} className="sm:col-span-2" />
         <F label="Phone" name="phone" type="tel" defaultValue={v("phone")} error={errors.phone} placeholder="+91 98765 43210" />
         <F label="Email" name="email" type="email" defaultValue={v("email")} error={errors.email} />
-        <F label="Budget from (₹)" name="budgetMin" type="number" defaultValue={v("budgetMin")} error={errors.budgetMin} inputProps={{ min: 0, step: 1000 }} />
-        <F label="Budget up to (₹)" name="budgetMax" type="number" defaultValue={v("budgetMax")} error={errors.budgetMax} inputProps={{ min: 0, step: 1000 }} />
+        <F label="Budget from (₹)" name="budgetMin" type="number" defaultValue={v("budgetMin")} error={errors.budgetMin} inputProps={{ min: 0, step: "any" }} />
+        <F label="Budget up to (₹)" name="budgetMax" type="number" defaultValue={v("budgetMax")} error={errors.budgetMax} inputProps={{ min: 0, step: "any" }} />
         <S label="Preferred project" name="projectId" options={options.projects} defaultValue={v("projectId")} />
         <F label="Preferred location" name="preferredLocation" defaultValue={v("preferredLocation")} />
         <F label="Property type" name="propertyType" defaultValue={v("propertyType")} placeholder="Apartment, Villa…" />
@@ -99,7 +99,7 @@ export function LeadForm({ options, defaults, leadId }: { options: LeadFormOptio
 function F({ label, name, error, hint, className, required, inputProps, ...rest }: { label: string; name: string; error?: string; hint?: string; className?: string; required?: boolean; type?: string; defaultValue?: string; placeholder?: string; inputProps?: Record<string, unknown> }) {
   return (
     <Field label={label} name={name} error={error} hint={hint} className={className} required={required}>
-      <Input id={name} name={name} required={required} aria-invalid={error ? true : undefined} {...rest} {...inputProps} />
+      <Input name={name} required={required} aria-invalid={error ? true : undefined} {...rest} {...inputProps} />
     </Field>
   );
 }
@@ -107,7 +107,7 @@ function F({ label, name, error, hint, className, required, inputProps, ...rest 
 function S({ label, name, options, defaultValue, required }: { label: string; name: string; options: Opt[]; defaultValue?: string; required?: boolean }) {
   return (
     <Field label={label} name={name} required={required}>
-      <Select id={name} name={name} defaultValue={defaultValue ?? ""} required={required}>
+      <Select name={name} defaultValue={defaultValue ?? ""} required={required}>
         {!required && <option value="">—</option>}
         {options.map((o) => (
           <option key={o.value} value={o.value}>{o.label}</option>

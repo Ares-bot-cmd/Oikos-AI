@@ -37,14 +37,14 @@ function TemplateSender({ leadId, templates, disabled }: { leadId: string; templ
       <ActionForm action={sendTemplateAction} className="space-y-3">
         <input type="hidden" name="leadId" value={leadId} />
         <Field label="Template" name="templateId">
-          <Select id="templateId" name="templateId" value={id} onChange={(e) => setId(e.target.value)}>
+          <Select name="templateId" value={id} onChange={(e) => setId(e.target.value)}>
             {templates.map((t) => <option key={t.id} value={t.id}>{t.name} ({t.language})</option>)}
           </Select>
         </Field>
         {tpl && <p className="whitespace-pre-wrap rounded-md bg-ivory p-3 text-[13px] text-ink-2">{tpl.body}</p>}
         {tpl && Array.from({ length: tpl.variableCount }).map((_, i) => (
           <Field key={`${tpl.id}-${i}`} label={`Value for {{${i + 1}}}`} name={`param-${i}`}>
-            <Input id={`param-${i}`} name="param" maxLength={200} placeholder={i === 0 ? "Defaults to the customer's first name" : ""} />
+            <Input name="param" maxLength={200} placeholder={i === 0 ? "Defaults to the customer's first name" : ""} />
           </Field>
         ))}
         <div className="flex justify-end"><SubmitButton>Send</SubmitButton></div>

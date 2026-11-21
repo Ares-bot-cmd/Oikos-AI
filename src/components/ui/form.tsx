@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useActionState, useContext, useEffect, useRef } from "react";
+import { createContext, useActionState, useContext, useEffect, useMemo, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { useSubmit } from "@/lib/use-submit";
 import { Loader2 } from "lucide-react";
@@ -12,6 +12,23 @@ import { Notice } from "./states";
 import { Field, Input, Select, Textarea } from "./field";
 
 type Action = (prev: ActionState, fd: FormData) => Promise<ActionState>;
+
+/**
+ * Fires the result toast as soon as the server action returns — not in an effect — so it still
+ * shows when the triggering button disappears after the refresh (e.g. "Revoke", "Mark read").
+ */
+function withToasts(action: Action, opts: { successMessage?: string; errorToast?: boolean }): Action {
+  return async (prev, fd) => {
+    const res = await action(prev, fd);
+    if (res?.ok) {
+      const msg = res.message ?? opts.successMessage;
+      if (msg) toast(msg, "success");
+    } else if (res?.error && opts.errorToast) {
+      toast(res.error, "error");
+    }
+    return res;
+  };
+}
 
 const FormStateCtx = createContext<ActionState>(null);
 const PendingCtx = createContext(false);
@@ -41,7 +58,8 @@ export function ActionForm({
   /** Keep a surrounding dialog open on success (e.g. to show a generated key). */
   keepOpen?: boolean;
 }) {
-  const [state, formAction, isPending] = useActionState(action, null);
+  const wrapped = useMemo(() => withToasts(action, { successMessage }), [action, successMessage]);
+  const [state, formAction, isPending] = useActionState(wrapped, null);
   const { pending, onSubmit } = useSubmit(formAction);
   const formRef = useRef<HTMLFormElement>(null);
   const dialog = useDialog();
@@ -51,13 +69,11 @@ export function ActionForm({
     if (!state || state === last.current) return;
     last.current = state;
     if (state.ok) {
-      const msg = state.message ?? successMessage;
-      if (msg) toast(msg, "success");
       if (resetOnSuccess) formRef.current?.reset();
       if (!keepOpen) dialog?.close();
       onSuccess?.(state);
     }
-  }, [state, successMessage, resetOnSuccess, dialog, onSuccess, keepOpen]);
+  }, [state, resetOnSuccess, dialog, onSuccess, keepOpen]);
 
   return (
     <FormStateCtx.Provider value={state}>
@@ -128,12 +144,10 @@ export function FormField({
   const errors = useFormErrors();
   const error = errors[name];
   const common = {
-    id: name,
     name,
     required,
     defaultValue: defaultValue ?? undefined,
     "aria-invalid": error ? true : undefined,
-    "aria-describedby": error ? `${name}-error` : undefined,
     ...inputProps,
   };
   return (
@@ -175,15 +189,9 @@ export function InlineAction({
   size?: "sm" | "md";
   className?: string;
 }) {
-  const [state, formAction, isPending] = useActionState(action, null);
+  const wrapped = useMemo(() => withToasts(action, { errorToast: true }), [action]);
+  const [, formAction, isPending] = useActionState(wrapped, null);
   const { pending, onSubmit } = useSubmit(formAction);
-  const last = useRef<ActionState>(null);
-  useEffect(() => {
-    if (!state || state === last.current) return;
-    last.current = state;
-    if (state.ok && state.message) toast(state.message, "success");
-    if (state.error) toast(state.error, "error");
-  }, [state]);
   return (
     <PendingCtx.Provider value={pending || isPending}>
     <form

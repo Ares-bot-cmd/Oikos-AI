@@ -28,8 +28,8 @@ function ProjectFields({ v }: { v?: ProjectValues }) {
       <FormField label="Property type" name="propertyType" as="select" required options={TYPES} defaultValue={val("propertyType")} />
       <FormField label="Status" name="status" as="select" required options={STATUSES} defaultValue={val("status") ?? "under_construction"} />
       <FormField label="Total planned units" name="totalUnits" type="number" defaultValue={val("totalUnits") ?? 0} inputProps={{ min: 0 }} />
-      <FormField label="Price from (₹)" name="priceFrom" type="number" defaultValue={val("priceFrom")} inputProps={{ min: 0, step: 10000 }} />
-      <FormField label="Price to (₹)" name="priceTo" type="number" defaultValue={val("priceTo")} inputProps={{ min: 0, step: 10000 }} />
+      <FormField label="Price from (₹)" name="priceFrom" type="number" defaultValue={val("priceFrom")} inputProps={{ min: 0, step: "any" }} />
+      <FormField label="Price to (₹)" name="priceTo" type="number" defaultValue={val("priceTo")} inputProps={{ min: 0, step: "any" }} />
       <FormField label="RERA number" name="reraNumber" defaultValue={val("reraNumber")} />
       <FormField label="Possession date" name="possessionDate" type="date" defaultValue={val("possessionDate")} />
       <FormField label="Amenities" name="amenities" defaultValue={val("amenities")} placeholder="Pool, gym, clubhouse…" className="sm:col-span-2" />
@@ -83,7 +83,7 @@ function UnitFields({ projects, v }: { projects: Opt[]; v?: ProjectValues }) {
       <FormField label="Floor" name="floor" type="number" required defaultValue={val("floor")} />
       <FormField label="Configuration" name="configuration" required defaultValue={val("configuration")} placeholder="2BHK" />
       <FormField label="Carpet area (sq ft)" name="carpetArea" type="number" required defaultValue={val("carpetArea")} inputProps={{ min: 1, step: "0.01" }} />
-      <FormField label="Price (₹)" name="price" type="number" required defaultValue={val("price")} inputProps={{ min: 1, step: 1000 }} />
+      <FormField label="Price (₹)" name="price" type="number" required defaultValue={val("price")} inputProps={{ min: 1, step: "any" }} />
       <FormField label="Facing" name="facing" defaultValue={val("facing")} placeholder="East" />
       <FormField label="Floor plan link (https)" name="floorPlanUrl" type="url" defaultValue={val("floorPlanUrl")} />
     </div>
@@ -125,8 +125,8 @@ export function BulkUnitsButton({ projects, projectId }: { projects: Opt[]; proj
           <FormField label="To floor" name="floorTo" type="number" required defaultValue={10} />
           <FormField label="Units per floor" name="unitsPerFloor" type="number" required defaultValue={4} inputProps={{ min: 1, max: 50 }} />
           <FormField label="Carpet area (sq ft)" name="carpetArea" type="number" required inputProps={{ min: 1 }} />
-          <FormField label="Base price (₹)" name="basePrice" type="number" required inputProps={{ min: 1, step: 10000 }} />
-          <FormField label="Floor rise per floor (₹)" name="floorRise" type="number" defaultValue={0} inputProps={{ min: 0, step: 1000 }} />
+          <FormField label="Base price (₹)" name="basePrice" type="number" required inputProps={{ min: 1, step: "any" }} />
+          <FormField label="Floor rise per floor (₹)" name="floorRise" type="number" defaultValue={0} inputProps={{ min: 0, step: "any" }} />
         </div>
         <div className="flex justify-end"><SubmitButton pendingText="Generating…">Generate</SubmitButton></div>
       </ActionForm>

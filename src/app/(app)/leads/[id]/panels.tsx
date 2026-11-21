@@ -6,7 +6,7 @@ import { CalendarPlus, Check, MapPin, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { ActionForm, FormField, SubmitButton } from "@/components/ui/form";
-import { Field, Select, Textarea } from "@/components/ui/field";
+import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import {
   changeStageAction, completeFollowUpAction, deleteLeadAction, logActivityAction, reserveUnitAction, scheduleFollowUpAction,
   scheduleVisitAction, visitOutcomeAction,
@@ -23,14 +23,7 @@ function IsoDateTime({ name, label, defaultHours = 24, required = true }: { name
   const local = edited ?? initial;
   return (
     <Field label={label} name={`${name}-local`} required={required}>
-      <input
-        id={`${name}-local`}
-        type="datetime-local"
-        value={local}
-        required={required}
-        onChange={(e) => setLocal(e.target.value)}
-        className="h-9 w-full rounded-md border border-line-strong bg-surface px-3 text-sm focus:border-emerald focus:outline-none focus:ring-2 focus:ring-emerald/15"
-      />
+      <Input type="datetime-local" value={local} required={required} onChange={(e) => setLocal(e.target.value)} />
       <input type="hidden" name={name} value={local && !Number.isNaN(new Date(local).getTime()) ? new Date(local).toISOString() : ""} />
     </Field>
   );
@@ -51,13 +44,13 @@ export function StageControl({ leadId, stage, stages }: { leadId: string; stage:
     <ActionForm action={changeStageAction} resetOnSuccess={false} className="flex flex-wrap items-end gap-2">
       <input type="hidden" name="id" value={leadId} />
       <Field label="Stage" name="stage">
-        <Select id="stage" name="stage" value={next} onChange={(e) => setNext(e.target.value)} className="w-52" disabled={stage === "booked"}>
+        <Select name="stage" value={next} onChange={(e) => setNext(e.target.value)} className="w-52" disabled={stage === "booked"}>
           {stages.map((s) => <option key={s.value} value={s.value} disabled={s.value === "booked"}>{s.label}</option>)}
         </Select>
       </Field>
       {next === "lost" && (
         <Field label="Reason lost" name="lostReason" required>
-          <input id="lostReason" name="lostReason" required maxLength={300} placeholder="e.g. Bought elsewhere" className="h-9 w-56 rounded-md border border-line-strong bg-surface px-3 text-sm" />
+          <Input name="lostReason" required maxLength={300} placeholder="e.g. Bought elsewhere" className="w-56" />
         </Field>
       )}
       {next !== stage && <SubmitButton size="md">Update stage</SubmitButton>}
@@ -72,7 +65,7 @@ export function LogActivityForm({ leadId }: { leadId: string }) {
       <input type="hidden" name="leadId" value={leadId} />
       <div className="grid gap-3 sm:grid-cols-3">
         <Field label="Type" name="type">
-          <Select id="type" name="type" value={type} onChange={(e) => setType(e.target.value)}>
+          <Select name="type" value={type} onChange={(e) => setType(e.target.value)}>
             <option value="call">Call</option><option value="whatsapp">WhatsApp</option><option value="email">Email</option>
             <option value="meeting">Meeting</option><option value="note">Internal note</option>
           </Select>
@@ -80,10 +73,10 @@ export function LogActivityForm({ leadId }: { leadId: string }) {
         {type !== "note" && (
           <>
             <Field label="Direction" name="direction">
-              <Select id="direction" name="direction" defaultValue="outbound"><option value="outbound">We reached out</option><option value="inbound">Customer reached us</option></Select>
+              <Select name="direction" defaultValue="outbound"><option value="outbound">We reached out</option><option value="inbound">Customer reached us</option></Select>
             </Field>
             <Field label="Outcome" name="outcome">
-              <Select id="outcome" name="outcome" defaultValue="">
+              <Select name="outcome" defaultValue="">
                 <option value="">—</option><option>Connected</option><option>No answer</option><option>Busy</option><option>Interested</option><option>Not interested</option><option>Call back later</option>
               </Select>
             </Field>
@@ -91,7 +84,7 @@ export function LogActivityForm({ leadId }: { leadId: string }) {
         )}
       </div>
       <Field label={type === "note" ? "Note (internal only)" : "Summary"} name="body" required>
-        <Textarea id="body" name="body" required maxLength={4000} placeholder={type === "note" ? "Visible to your team only" : "What was discussed?"} />
+        <Textarea name="body" required maxLength={4000} placeholder={type === "note" ? "Visible to your team only" : "What was discussed?"} />
       </Field>
       <div className="flex justify-end"><SubmitButton size="sm">Save activity</SubmitButton></div>
     </ActionForm>
@@ -154,7 +147,7 @@ export function VisitOutcomeButton({ id }: { id: string }) {
       <ActionForm action={visitOutcomeAction} className="space-y-3">
         <input type="hidden" name="id" value={id} />
         <Field label="Outcome" name="status">
-          <Select id="status" name="status" value={status} onChange={(e) => setStatus(e.target.value)}>
+          <Select name="status" value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="completed">Visit completed</option><option value="no_show">Customer didn&apos;t show up</option><option value="cancelled">Cancelled</option>
           </Select>
         </Field>

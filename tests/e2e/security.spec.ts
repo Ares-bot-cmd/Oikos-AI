@@ -98,9 +98,13 @@ test.describe("security", () => {
       expect(res?.status()).toBe(200);
       await expect(page.getByText(/No leads match|No leads yet/)).toBeVisible();
     }
-    // Invalid identifiers don't error out.
-    expect((await page.goto("/leads/not-a-uuid"))?.status()).toBe(404);
-    expect((await page.goto("/bookings/00000000-0000-0000-0000-000000000000"))?.status()).toBe(404);
+    // Invalid identifiers render the Not Found page (no error, no data). The status is 200
+    // because the loading skeleton has already streamed when the page resolves to not-found.
+    for (const path of ["/leads/not-a-uuid", "/leads/' OR '1'='1", "/bookings/00000000-0000-0000-0000-000000000000"]) {
+      const res = await page.goto(path);
+      expect(res?.status()).toBeLessThan(500);
+      await expect(page.getByRole("heading", { name: "Not found" })).toBeVisible();
+    }
   });
 
   test("sign-in is rate limited and accounts lock after repeated failures", async ({ page, browser }) => {

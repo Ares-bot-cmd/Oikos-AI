@@ -13,7 +13,7 @@ export function TargetsButton({ m }: { m: { membershipId: string; name: string; 
       <ActionForm action={updateTargetsAction} resetOnSuccess={false} className="space-y-3">
         <input type="hidden" name="membershipId" value={m.membershipId} />
         <FormField label="Monthly booking target" name="monthlyBookingTarget" type="number" defaultValue={m.monthlyBookingTarget} inputProps={{ min: 0 }} />
-        <FormField label="Monthly revenue target (₹)" name="monthlyRevenueTarget" type="number" defaultValue={m.monthlyRevenueTarget} inputProps={{ min: 0, step: 100000 }} hint="Attainment uses revenue when set, otherwise bookings." />
+        <FormField label="Monthly revenue target (₹)" name="monthlyRevenueTarget" type="number" defaultValue={m.monthlyRevenueTarget} inputProps={{ min: 0, step: "any" }} hint="Attainment uses revenue when set, otherwise bookings." />
         <FormField label="Phone" name="phone" type="tel" defaultValue={m.phone} />
         <Checkbox name="receivesLeads" label="Include in round-robin lead assignment" defaultChecked={m.receivesLeads} />
         <div className="flex justify-end"><SubmitButton>Save</SubmitButton></div>

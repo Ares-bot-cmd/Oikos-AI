@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { useSubmit } from "@/lib/use-submit";
 import type { ActionState } from "@/lib/actions";
 import type { ImportResult } from "@/lib/services/imports";
@@ -14,6 +14,7 @@ export function ImportForm({ members, canAssign }: { members: { value: string; l
   const [state, action] = useActionState<ActionState, FormData>(importLeadsAction, null);
   const { onSubmit } = useSubmit(action);
   const result = state?.data as ImportResult | undefined;
+  const fileId = useId();
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {state?.error && <Notice tone="danger">{state.error}</Notice>}
@@ -29,18 +30,18 @@ export function ImportForm({ members, canAssign }: { members: { value: string; l
           <Link href="/leads?sort=created&dir=desc" className="mt-2 inline-block font-medium underline">View leads</Link>
         </Notice>
       )}
-      <Field label="File (.csv or .xlsx)" name="file" required>
-        <input id="file" name="file" type="file" required accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="block w-full text-sm file:mr-3 file:rounded-md file:border file:border-line-strong file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-ivory" />
+      <Field label="File (.csv or .xlsx)" name="file" id={fileId} required>
+        <input id={fileId} name="file" type="file" required accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="block w-full text-sm file:mr-3 file:rounded-md file:border file:border-line-strong file:bg-surface file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-ivory" />
       </Field>
       <Field label="When a lead already exists (same phone or email)" name="duplicateMode">
-        <Select id="duplicateMode" name="duplicateMode" defaultValue="skip">
+        <Select name="duplicateMode" defaultValue="skip">
           <option value="skip">Skip the row</option>
           <option value="update">Update the existing lead with new details</option>
         </Select>
       </Field>
       {canAssign && (
         <Field label="Assign new leads to" name="ownerId">
-          <Select id="ownerId" name="ownerId" defaultValue="">
+          <Select name="ownerId" defaultValue="">
             <option value="">Leave unassigned / use automation rules</option>
             {members.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
           </Select>

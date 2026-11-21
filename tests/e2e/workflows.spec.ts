@@ -121,10 +121,11 @@ test.describe.serial("critical sales workflow", () => {
     await exec.getByRole("link", { name: "Priya Sharma" }).click();
     await exec.waitForURL(leadUrl);
 
-    await exec.getByLabel("Type", { exact: true }).selectOption("call");
-    await exec.getByLabel("Outcome").selectOption("Interested");
-    await exec.getByLabel("Summary").fill("Discussed 2BHK options on higher floors");
-    await exec.getByRole("button", { name: "Save activity" }).click();
+    const activity = exec.locator("form").filter({ has: exec.getByRole("button", { name: "Save activity" }) });
+    await activity.getByLabel("Type", { exact: true }).selectOption("call");
+    await activity.getByLabel("Outcome").selectOption("Interested");
+    await activity.getByLabel("Summary").fill("Discussed 2BHK options on higher floors");
+    await activity.getByRole("button", { name: "Save activity" }).click();
     await expectToast(exec, "Activity logged");
     await expect(exec.getByText("Discussed 2BHK options on higher floors")).toBeVisible();
 

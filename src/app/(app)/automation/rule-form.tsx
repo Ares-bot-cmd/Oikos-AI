@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -16,18 +16,19 @@ export function NewRuleButton({ triggers, actions, members, projects, sources, s
   const [trigger, setTrigger] = useState("lead_created");
   const [action, setAction] = useState("assign_round_robin");
   const assignment = action === "assign_round_robin" || action === "assign_user";
+  const userIdsId = useId();
   return (
     <Dialog wide title="New automation rule" description="When the trigger happens and the conditions match, Oikos runs the action." trigger={(open) => <Button onClick={open}><Plus className="size-4" /> New rule</Button>}>
       <ActionForm action={createRuleAction} className="space-y-4">
         <FormField label="Rule name" name="name" required placeholder="e.g. Assign Meta leads round-robin" />
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="When" name="trigger">
-            <Select id="trigger" name="trigger" value={trigger} onChange={(e) => { setTrigger(e.target.value); if (e.target.value !== "lead_created" && assignment) setAction("notify_owner"); }}>
+            <Select name="trigger" value={trigger} onChange={(e) => { setTrigger(e.target.value); if (e.target.value !== "lead_created" && assignment) setAction("notify_owner"); }}>
               {triggers.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
             </Select>
           </Field>
           <Field label="Then" name="action">
-            <Select id="action" name="action" value={action} onChange={(e) => setAction(e.target.value)}>
+            <Select name="action" value={action} onChange={(e) => setAction(e.target.value)}>
               {actions.map((a) => <option key={a.value} value={a.value} disabled={trigger !== "lead_created" && (a.value === "assign_round_robin" || a.value === "assign_user")}>{a.label}</option>)}
             </Select>
           </Field>
@@ -41,8 +42,8 @@ export function NewRuleButton({ triggers, actions, members, projects, sources, s
           </div>
         </fieldset>
         {action === "assign_round_robin" && (
-          <Field label="Rotate between" name="userIds" hint="Leave empty to rotate across all sales executives who receive leads">
-            <select id="userIds" name="userIds" multiple className="h-28 w-full rounded-md border border-line-strong bg-surface px-2 py-1 text-sm">
+          <Field label="Rotate between" name="userIds" id={userIdsId} hint="Leave empty to rotate across all sales executives who receive leads">
+            <select id={userIdsId} name="userIds" multiple className="h-28 w-full rounded-md border border-line-strong bg-surface px-2 py-1 text-sm">
               {members.map((m) => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
           </Field>

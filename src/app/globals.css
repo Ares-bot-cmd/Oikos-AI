@@ -64,6 +64,11 @@
   ::selection {
     background: var(--color-emerald-soft);
   }
+  /* Grid items default to min-width:auto, which lets a wide table inside a panel stretch the
+     whole page on small screens. Allow them to shrink so tables scroll inside their panel. */
+  .grid > * {
+    min-width: 0;
+  }
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;

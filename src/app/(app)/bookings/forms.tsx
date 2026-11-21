@@ -38,13 +38,13 @@ export function BookingForm({
     <ActionForm action={createBookingAction} resetOnSuccess={false} className="space-y-5">
       <section className="grid gap-3 sm:grid-cols-2">
         <Field label="Customer (lead)" name="leadId" required>
-          <Select id="leadId" name="leadId" required value={leadId} onChange={(e) => setLeadId(e.target.value)}>
+          <Select name="leadId" required value={leadId} onChange={(e) => setLeadId(e.target.value)}>
             <option value="" disabled>Select the lead…</option>
             {leads.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
           </Select>
         </Field>
         <Field label="Unit" name="unitId" required hint={units.length ? "Available units, and any reserved for this lead" : "No available units — add inventory first"}>
-          <Select id="unitId" name="unitId" required value={unitId} onChange={(e) => {
+          <Select name="unitId" required value={unitId} onChange={(e) => {
             setUnitId(e.target.value);
             const u = units.find((x) => x.value === e.target.value);
             if (u) setValue(String(u.price)); // default to list price; editable below
@@ -55,9 +55,9 @@ export function BookingForm({
         </Field>
         <FormField label="Booking date" name="bookingDate" type="date" required defaultValue={date} key={date} />
         <Field label="Agreement value (₹)" name="agreementValue" required hint="Defaults to the unit's list price; enter the negotiated value">
-          <Input id="agreementValue" name="agreementValue" type="number" min={1} step={1000} required value={value} onChange={(e) => setValue(e.target.value)} />
+          <Input name="agreementValue" type="number" min={1} step="any" required value={value} onChange={(e) => setValue(e.target.value)} />
         </Field>
-        <FormField label="Booking amount (₹)" name="bookingAmount" type="number" required inputProps={{ min: 0, step: 1000 }} />
+        <FormField label="Booking amount (₹)" name="bookingAmount" type="number" required inputProps={{ min: 0, step: "any" }} />
         <FormField label="Payment plan" name="plan" as="select" required defaultValue="clp" options={plans} hint="Creates the milestone schedule automatically" />
         {canAssign && <FormField label="Credited to (sales executive)" name="salesUserId" as="select" options={members} hint="Defaults to the lead owner" />}
       </section>
