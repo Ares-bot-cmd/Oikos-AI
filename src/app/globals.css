@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand */
+  --color-forest: #173b2f;
+  --color-forest-2: #244b3c;
+  --color-emerald: #28634b;
+  --color-emerald-soft: #e3ece6;
+  --color-sage: #a8b8a7;
+  --color-champagne: #b99a64;
+  --color-champagne-soft: #f3ecdf;
+
+  /* Surfaces & text */
+  --color-ivory: #f5f3ec;
+  --color-surface: #ffffff;
+  --color-line: #e6e8e1;
+  --color-line-strong: #d4d8cd;
+  --color-ink: #252b27;
+  --color-ink-2: #4b544e;
+  --color-muted: #6f7a72;
+
+  /* Status */
+  --color-positive: #2f7a55;
+  --color-positive-soft: #e5f1ea;
+  --color-warning: #a8741a;
+  --color-warning-soft: #f8efdc;
+  --color-danger: #b3412e;
+  --color-danger-soft: #f8e6e2;
+  --color-info: #3f6474;
+  --color-info-soft: #e5eef1;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --shadow-card: 0 1px 2px rgb(23 59 47 / 0.04), 0 1px 1px rgb(23 59 47 / 0.03);
+  --shadow-pop: 0 8px 24px rgb(23 59 47 / 0.12), 0 2px 6px rgb(23 59 47 / 0.06);
+  --radius-card: 10px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-emerald);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--color-emerald-soft);
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.animate-fade-in {
+  animation: fade-in 180ms ease-out both;
+}
+
+dialog::backdrop {
+  background: rgb(23 59 47 / 0.35);
+}
